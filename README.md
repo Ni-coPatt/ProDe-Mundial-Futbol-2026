@@ -10,45 +10,21 @@ Desarrollada con **Python + Flask + MySQL**, para la materia Introducción al De
 
 ```
 prode-mundial/
-├── run.py                  # Punto de entrada
-├── requirements.txt
-├── .env.example            # Variables de entorno (renombrar a .env)
+├── main.py                # Programa principal
+├── data/
+│   ├── partidos.py        # Lista de partidos
+│   ├── usuarios.py        # Lista de usuarios
+│   ├── resultados.py      # Resultados
+│   └── predicciones.py    # Predicciones
 │
-├── config/
-│   └── settings.py         # Configuración de la app (DB, secret key)
-│
-├── app/
-│   ├── __init__.py         # create_app(): fábrica de la aplicación Flask
-│   ├── extensions.py       # Instancia compartida de SQLAlchemy
-│   │
-│   ├── models/             # Modelos ORM (tablas de la base de datos)
-│   │   ├── partido.py      # Tabla partidos
-│   │   ├── resultado.py    # Tabla resultados (relación 1-a-1 con partido)
-│   │   ├── usuario.py      # Tabla usuarios
-│   │   └── prediccion.py   # Tabla predicciones (usuario + partido + marcador)
-│   │
-│   ├── routes/             # Blueprints: reciben requests y devuelven responses
-│   │   ├── partidos.py     # GET/POST/PUT/PATCH/DELETE /partidos
-│   │   ├── resultados.py   # PUT /partidos/<id>/resultado
-│   │   ├── usuarios.py     # CRUD /usuarios
-│   │   ├── predicciones.py # POST /partidos/<id>/prediccion
-│   │   └── ranking.py      # GET /ranking
-│   │
-│   ├── services/           # Lógica de negocio y validaciones
-│   │   ├── partido_service.py
-│   │   ├── resultado_service.py
-│   │   ├── usuario_service.py
-│   │   ├── prediccion_service.py
-│   │   └── ranking_service.py
-│   │
-│   └── utils/
-│       └── pagination.py   # Helper HATEOAS: _limit, _offset, _first, _prev, _next, _last
-│
-├── migrations/
-│   └── crear_tablas.sql    # Script SQL para crear la DB manualmente
+├── logic/
+│   ├── partidos.py        # Funciones sobre partidos
+│   ├── usuarios.py        # Funciones sobre usuarios
+│   ├── predicciones.py    # Funciones de predicción
+│   └── ranking.py         # Cálculo de ranking
 │
 └── tests/
-    └── test_partidos.py    # Tests con pytest (usan SQLite en memoria)
+    └── test_partidos.py
 ```
 
 ---
