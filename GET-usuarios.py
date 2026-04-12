@@ -29,7 +29,7 @@ def listar_usuarios():
         usuarios= cursor.fetchall()
         
         if not usuarios:
-            return '', 204
+            return jsonify({"usuarios": []}), 204
         
         #calculamos el ultimo offset posible.
         cursor.execute("SELECT COUNT(*) AS total FROM usuarios")
