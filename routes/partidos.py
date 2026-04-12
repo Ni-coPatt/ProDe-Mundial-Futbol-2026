@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from datetime import datetime
 
 partidos_bp = Blueprint("partidos", __name__, url_prefix="/partidos")
-
+# ejemplos para el uso de postman
 partidos_db = {
     1: {"id": 1, "equipo_local": "Argentina", "equipo_visitante": "Francia", "fecha": "2026-06-15", "fase": "grupos"},
     2: {"id": 2, "equipo_local": "Brasil", "equipo_visitante": "Uruguay", "fecha": "2026-06-16", "fase": "grupos"},
@@ -11,6 +11,7 @@ partidos_db = {
 FASES_VALIDAS = {"grupos", "dieciseisavos", "octavos", "cuartos", "semis", "final"}
 
 
+# funciones que pienso agregar en archivos aparte "validations.py"
 def validar_fecha(fecha_str):
     try:
         datetime.strptime(fecha_str, "%Y-%m-%d")
