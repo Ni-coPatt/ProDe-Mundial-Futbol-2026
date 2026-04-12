@@ -28,13 +28,14 @@ def validar_fase(fase):
 @partidos_bp.route("/<int:id>", methods=["PATCH"])
 def actualizar_partidos(id):
     try:
+
+        if not datos_presentes:
+            return jsonify({"error": "Al menos un campo debe estar presente"}), 400
+
         data = request.get_json()
         # ver si el campo es valido para cambiar
         datos_validos = ["equipo_local", "equipo_visitante", "fecha", "fase"]
         datos_presentes = [dato for dato in datos_validos if dato in data]
-
-        if not datos_presentes:
-            return jsonify({"error": "Al menos un campo debe estar presente"}), 400
 
         # Validar valores de los campos presentes
         for campo in datos_presentes:
