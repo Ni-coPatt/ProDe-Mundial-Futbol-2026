@@ -20,14 +20,19 @@ SELECT * FROM partidos;
 
 
 CREATE TABLE usuarios(
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    nombre varchar(40),
+    puntos int unsigned default 0,
+    mail varchar(40)
 );
 
-INSERT INTO usuarios (id)
+INSERT INTO usuarios (nombre, puntos, mail) 
 VALUES
-    (1),
-    (2),
-    (3);
+    ("juanito",0,"ElMasCapito123@yahoo.com"),
+    ("manuelita",9,"pehuajo@gmail.com"),
+    ("Pablo",3,"clavito@gmail.com"),
+    ("luna",1,"luna@gmail.com"),
+    ("valentin",7,"valentin@gmail.com");
 
 SELECT * FROM usuarios;
 
