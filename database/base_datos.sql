@@ -16,8 +16,6 @@ VALUES
     (2),
     (3);
 
-SELECT * FROM partidos;
-
 
 CREATE TABLE usuarios(
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -33,8 +31,6 @@ VALUES
     ("Pablo",3,"clavito@gmail.com"),
     ("luna",1,"luna@gmail.com"),
     ("valentin",7,"valentin@gmail.com");
-
-SELECT * FROM usuarios;
 
 
 CREATE TABLE predicciones(
@@ -57,3 +53,5 @@ VALUES
     (3, 2, 0, 0);
 
 SELECT * FROM predicciones;
+SELECT * FROM partidos;
+SELECT * FROM usuarios;
