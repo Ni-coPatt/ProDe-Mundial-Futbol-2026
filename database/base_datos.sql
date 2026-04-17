@@ -32,7 +32,7 @@ CREATE TABLE usuarios(
     mail varchar(40)
 );
 
-INSERT INTO usuarios (nombre, puntos, mail) 
+INSERT INTO usuarios (nombre, puntos, email) 
 VALUES
     ("juanito",0,"ElMasCapito123@yahoo.com"),
     ("manuelita",9,"pehuajo@gmail.com"),
