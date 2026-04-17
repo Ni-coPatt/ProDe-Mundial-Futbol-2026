@@ -7,14 +7,22 @@ DROP TABLE IF EXISTS partidos;
 DROP TABLE IF EXISTS usuarios;
 
 CREATE TABLE partidos (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    equipo_local VARCHAR(100) NOT NULL,
+    equipo_visitante VARCHAR(100) NOT NULL,
+    estadio VARCHAR(100),
+    ciudad VARCHAR(100),
+    fecha DATETIME,
+    fase VARCHAR(50) NOT NULL,
+    gol_local INT DEFAULT NULL,
+    gol_visitante INT DEFAULT NULL
 );
-
-INSERT INTO partidos (id)
+-- Insertar partidos de prueba (Nota: debe ir antes de las predicciones)
+INSERT INTO partidos (equipo_local, equipo_visitante, estadio, ciudad, fecha, fase, gol_local, gol_visitante)
 VALUES
-    (1),
-    (2),
-    (3);
+    ('Argentina', 'Francia', 'Lusail', 'Doha', '2026-06-15 15:00:00', 'Final', '3', '3'),
+    ('Brasil', 'Uruguay', 'Centenario', 'Montevideo', '2026-06-16 18:00:00', 'Grupos','2','0'),
+    ('España', 'Alemania', 'Santiago Bernabéu', 'Madrid', '2026-06-17 21:00:00', 'Semis','1','2');
 
 
 CREATE TABLE usuarios(
