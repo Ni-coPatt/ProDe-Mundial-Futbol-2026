@@ -124,3 +124,47 @@ def crear_usuario():
     finally: 
         cursor.close()
         conexion.close()
+
+@usuarios_bp.route('/usuarios/<int:id>', methods=['PUT'])
+def reemplazar_usuario(id):
+    datos = request.get_json()
+
+    if not datos:
+        return jsonify({"error" : "Body vacio"}), 400
+    
+    if 'nombre' not in datos or 'email' not in datos:
+        return jsonify({"error" : "Faltan campos obligatorios"}), 400
+    
+    nombre = datos.get('nombre')
+    email = datos.get('email')
+
+    conexion = None
+    cursor = None
+
+    try:
+        conexion = get_connection()
+        cursor = conexion.cursor()
+
+        query_update = "UPDATE usuarios SET nombre = %s, mail = %s WHERE id = %s"
+        cursor.execute(query_update, (nombre, email, id))
+        
+        if cursor.rowcount == 0:
+            query_insert = "INSERT INTO usuarios (id, nombre, mail, puntos) VALUES (%s, %s, %s, 0)"
+            cursor.execute(query_insert, (id, nombre, email))
+            
+        conexion.commit()
+
+        return "", 204
+
+    except Exception as e:
+        if conexion:
+            conexion.rollback()
+        print(e)
+        return jsonify({"error" : "Error interno del servidor"}), 500
+    
+    finally:
+        if cursor:
+            cursor.close()
+        if conexion:
+            conexion.close()
+
