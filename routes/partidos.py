@@ -122,33 +122,22 @@ def get_partido(id):
 
     try:
         conn = get_connection()
-        cursor = conn.cursor(dictionary=True)
-
-        query = """
-            SELECT 
-                p.id,
-                p.equipo_local,
-                p.equipo_visitante,
-                p.fecha,
-                p.fase,
-                r.goles_local,
-                r.goles_visitante
-            FROM partidos p
-            LEFT JOIN resultados r ON p.id = r.partido_id
-            WHERE p.id = %s
-        """
-
-        cursor.execute(query, (id,))
-        row = cursor.fetchone()
+        row = buscar_partido_por_id(id, conn)
 
         if not row:
             return jsonify({"error": "Partido no encontrado"}), 404
+        
+        if not validar_fecha(row["fecha"]):
+            return jsonify({"error": "Fecha inválida (YYYY-MM-DD)"}), 400
+
+        if not validar_fase(row["fase"]):
+            return jsonify({"error": "Fase inválida"}), 400
 
         response = {
             "id": row["id"],
             "equipo_local": row["equipo_local"],
             "equipo_visitante": row["equipo_visitante"],
-            "fecha": row["fecha"].isoformat() if row["fecha"] else None,
+            "fecha": row["fecha"],
             "fase": row["fase"],
         }
 
