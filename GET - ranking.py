@@ -1,3 +1,10 @@
+from flask import Blueprint, jsonify
+from data.db import get_connection
+
+ranking_bp = Blueprint("ranking", __name__)
+
+@ranking_bp.route("/ranking")
+
 from data.predicciones import predicciones
 from data.partidos import partidos
 
