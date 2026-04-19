@@ -12,10 +12,10 @@ def crear_partido_db(conn, equipo_local, equipo_visitante, fecha, fase):
     try:
         cur = conn.cursor()
         query = """
-            INSERT INTO partidos (equipo_local, equipo_visitante, fecha, fase)
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO partidos (equipo_local, equipo_visitante, fecha, fase, estadio, ciudad)
+            VALUES (%s, %s, %s, %s, %s, %s)
         """
-        cur.execute(query, (equipo_local, equipo_visitante, fecha, fase))
+        cur.execute(query, (equipo_local, equipo_visitante, fecha, fase, estadio, ciudad))
         conn.commit()
         return cur.lastrowid
     except Exception as e:
