@@ -2,6 +2,7 @@ from mysql.connector import Error
 
 
 def crear_partido_db(conn, equipo_local, equipo_visitante, fecha, fase):
+    cur = None
     try:
         cur = conn.cursor()
         query = """
@@ -16,20 +17,20 @@ def crear_partido_db(conn, equipo_local, equipo_visitante, fecha, fase):
             cur.close()
 
 
-def buscar_partido_por_id(id, conn):
+def buscar_partido_id_db(id, conn):
+    cur = None
     try:
         cur = conn.cursor(dictionary=True)
-
         query = "SELECT * FROM partidos WHERE id = %s"
         cur.execute(query, (id,))
         return cur.fetchone()
-
     finally:
         if cur:
             cur.close()
 
 
 def reemplazar_partido_db(conn, id, equipo_local, equipo_visitante, fecha, fase):
+    cur = None
     try:
         cur = conn.cursor()
 
@@ -52,7 +53,8 @@ def reemplazar_partido_db(conn, id, equipo_local, equipo_visitante, fecha, fase)
             cur.close()
 
 
-def actualizar_partido(id, cambios, conn):
+def actualizar_db(id, cambios, conn):
+    cur = None
     try:
         cur = conn.cursor()
 
@@ -76,7 +78,8 @@ def actualizar_partido(id, cambios, conn):
             cur.close()
 
 
-def eliminar_partido(id, conn):
+def eliminar_db(id, conn):
+    cur = None
     try:
         cur = conn.cursor()
 
@@ -91,24 +94,34 @@ def eliminar_partido(id, conn):
             cur.close()
 
 
-def listar_partidos_db(conn, limit, offset):
+def listar_partidos_db(conn, limit, offset, equipo=None, fecha=None, fase=None):
+    cur = None
     try:
         cur = conn.cursor(dictionary=True)
-
-        query = """
-            SELECT * FROM partidos
-            LIMIT %s OFFSET %s
-        """
-
-        cur.execute(query, (limit, offset))
-        return cur.fetchall()
-
+        filtros = []
+        params = []
+        if equipo:
+            filtros.append("(equipo_local=%s OR equipo_visitante=%s)")
+            params.extend([equipo, equipo])
+        if fecha:
+            filtros.append("fecha=%s")
+            params.append(fecha)
+        if fase:
+            filtros.append("fase=%s")
+            params.append(fase)
+        where = "WHERE " + " AND ".join(filtros) if filtros else ""
+        query = f"SELECT * FROM partidos {where} LIMIT %s OFFSET %s"
+        params.extend([limit, offset])
+        cur.execute(query, params)
+        partidos = cur.fetchall()
+        return partidos
     finally:
         if cur:
             cur.close()
 
 
 def contar_partidos_db(conn):
+    cur = None
     try:
         cur = conn.cursor(dictionary=True)
 

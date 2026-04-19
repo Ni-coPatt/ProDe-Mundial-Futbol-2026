@@ -1,4 +1,4 @@
-def build_pagination_links(base_url, limit, offset, total_count, extra_params=None):
+def pagination_links(base_url, limit, offset, total_count, extra_params=None):
     if limit <= 0:
         raise ValueError("limit debe ser mayor a 0")
 

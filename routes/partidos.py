@@ -1,14 +1,14 @@
 from flask import Blueprint, request, jsonify
 
-from db.connection import get_connection
+from data.db import get_connection
 
-from db.queries import (
+from database.queries import (
     crear_partido_db,
-    listar_partidos,
+    listar_partidos_db,
     reemplazar_partido_db,
-    buscar_partido_por_id,
-    actualizar_partido,
-    eliminar_partido,
+    buscar_partido_id_db,
+    actualizar_db,
+    eliminar_db,
 )
 
 from utils.validations import (
@@ -19,46 +19,47 @@ from utils.validations import (
     validar_campos_obligatorios,
 )
 
-from utils.helpers import build_pagination_links
+from utils.helpers import pagination_links
 
-partidos_bp = Blueprint("partidos", __name__, url_prefix="/partidos")
+partidos_bp = Blueprint("partidos", __name__)
 
 
 # endpoint 1(moya) lo cambie me mostraba solo por id
 @partidos_bp.route("/", methods=["GET"])
 def listar_partidos():
+    limit = request.args.get("_limit", 10)
+    offset = request.args.get("_offset", 0)
+    equipo = request.args.get("equipo")
+    fecha = request.args.get("fecha")
+    fase = request.args.get("fase")
+
+    paginado = validar_paginado(limit, offset)
+
+    if not paginado:
+        return jsonify({"error": "Paginado inválido"}), 400
+    limit, offset = paginado
+    if fecha and not validar_fecha(fecha):
+        return jsonify({"error": "Formato de fecha inválido"}), 400
+    if fase and not validar_fase(fase):
+        return jsonify({"error": "Fase inválida"}), 400
     conn = None
-    cur = None
-
     try:
-        limit = request.args.get("limit", 10)
-        offset = request.args.get("offset", 0)
-
-        if not str(limit).isdigit() or not str(offset).isdigit():
-            return jsonify({"error": "Paginado inválido"}), 400
-
-        limit = int(limit)
-        offset = int(offset)
-
         conn = get_connection()
-        cur = conn.cursor(dictionary=True)
+        partidos, total = listar_partidos_db(conn, limit, offset, equipo, fecha, fase)
+        campos = [("equipo", equipo), ("fecha", fecha), ("fase", fase)]
+        extra_params = {}
+        for key, value in campos:
+            if value:
+                extra_params[key] = value
 
-        cur.execute("SELECT * FROM partidos LIMIT %s OFFSET %s", (limit, offset))
-        partidos = cur.fetchall()
-
-        cur.execute("SELECT COUNT(*) as total FROM partidos")
-        total = cur.fetchone()["total"]
-
-        links = build_pagination_links(request.base_url, limit, offset, total)
-
+        links = pagination_links(request.base_url, limit, offset, total, extra_params=extra_params)
+        if not partidos:
+            return "", 204
         return jsonify({"partidos": partidos, "total": total, "_links": links}), 200
     except Exception as e:
         print(e)
         return jsonify({"error": "Error interno del servidor"}), 500
-
     finally:
-        if cur:
-            cur.close()
         if conn:
             conn.close()
 
@@ -111,20 +112,19 @@ def crear_partido():
 
 
 # endpoint 3
-
-
 @partidos_bp.route("/<int:id>", methods=["GET"])
-def get_partido(id):
+def obtener_partido(id: int):
     if id <= 0:
         return jsonify({"error": "ID inválido"}), 400
 
     conn = None
+    cursor = None
 
     try:
         conn = get_connection()
         row = buscar_partido_por_id(id, conn)
 
-        if not row:
+        if row is None:
             return jsonify({"error": "Partido no encontrado"}), 404
         
         if not validar_fecha(row["fecha"]):
@@ -133,18 +133,25 @@ def get_partido(id):
         if not validar_fase(row["fase"]):
             return jsonify({"error": "Fase inválida"}), 400
 
+        # 👉 conversión simple de fecha (sin isoformat para evitar errores)
+        fecha = row["fecha"]
+        fecha = str(fecha) if fecha else None
+
+        resultado = None
+        if row["goles_local"] is not None and row["goles_visitante"] is not None:
+            resultado = {
+                "local": row["goles_local"],
+                "visitante": row["goles_visitante"],
+            }
+
         response = {
             "id": row["id"],
             "equipo_local": row["equipo_local"],
             "equipo_visitante": row["equipo_visitante"],
-            "fecha": row["fecha"],
+            "fecha": fecha,
             "fase": row["fase"],
+            "resultado": resultado,
         }
-
-        if row["goles_local"] is not None and row["goles_visitante"] is not None:
-            response["resultado"] = {"goles_local": row["goles_local"], "goles_visitante": row["goles_visitante"]}
-        else:
-            response["resultado"] = None
 
         return jsonify(response), 200
 
@@ -153,6 +160,8 @@ def get_partido(id):
         return jsonify({"error": "Error interno del servidor"}), 500
 
     finally:
+        if cursor:
+            cursor.close()
         if conn:
             conn.close()
 
@@ -180,27 +189,16 @@ def reemplazar_partido(id):
     try:
         conn = get_connection()
 
-        partido = buscar_partido_por_id(id, conn)
+        partido = buscar_partido_id_db(id, conn)
         if not partido:
             return jsonify({"error": "Partido no encontrado"}), 404
 
-        ok = reemplazar_partido_db(
+        remplazado = reemplazar_partido_db(
             conn, id, data["equipo_local"], data["equipo_visitante"], data["fecha"], data["fase"]
         )
 
-        if ok:
-            return (
-                jsonify(
-                    {
-                        "id": id,
-                        "equipo_local": data["equipo_local"],
-                        "equipo_visitante": data["equipo_visitante"],
-                        "fecha": data["fecha"],
-                        "fase": data["fase"],
-                    }
-                ),
-                200,
-            )
+        if remplazado:
+            return "", 204
 
         return jsonify({"error": "No se pudo actualizar"}), 500
 
@@ -220,7 +218,7 @@ def actualizar_partido(id):
     data = request.get_json()
 
     if not data:
-        return jsonify({"error": "Body vaico"}), 400
+        return jsonify({"error": "body vacio"}), 400
 
     campos_permitidos = ["equipo_local", "equipo_visitante", "fecha", "fase"]
     cambios = {campo: data.get(campo) for campo in campos_permitidos if campo in data}
@@ -242,13 +240,13 @@ def actualizar_partido(id):
     try:
         conn = get_connection()
 
-        partido = buscar_partido_por_id(id, conn)
+        partido = buscar_partido_id_db(id, conn)
         if not partido:
             return jsonify({"error": "Partido no encontrado"}), 404
 
-        ok = actualizar_partido(id, cambios, conn)
+        partido_actualizado = actualizar_db(id, cambios, conn)
 
-        if ok:
+        if partido_actualizado:
             return "", 204
         else:
             return jsonify({"error": "Error interno del servidor"}), 500
@@ -269,13 +267,13 @@ def eliminar_partido(id):
     try:
         conn = get_connection()
 
-        partido = buscar_partido_por_id(id, conn)
+        partido = buscar_partido_id_db(id, conn)
         if not partido:
             return jsonify({"error": "Partido no encontrado"}), 404
 
-        ok = eliminar_partido(id, conn)
+        partido_eliminado = eliminar_db(id, conn)
 
-        if ok:
+        if partido_eliminado:
             return "", 204
         else:
             return jsonify({"error": "Error interno del servidor"}), 500
@@ -301,12 +299,12 @@ def cargar_resultado(id):
         if not data:
             return jsonify({"error": "Body vacío"}), 400
 
-        if "goles_local" not in data or "goles_visitante" not in data:
+        if "local" not in data or "visitante" not in data:
             return jsonify({"error": "Faltan datos"}), 400
 
         try:
-            goles_local = int(data["goles_local"])
-            goles_visitante = int(data["goles_visitante"])
+            goles_local = int(data["local"])
+            goles_visitante = int(data["visitante"])
         except (ValueError, TypeError):
             return jsonify({"error": "Goles deben ser enteros"}), 400
 
@@ -336,7 +334,7 @@ def cargar_resultado(id):
 
         conn.commit()
 
-        return jsonify({"mensaje": "Resultado cargado correctamente"}), 200
+        return jsonify, 204
 
     except Exception as e:
         print(e)
