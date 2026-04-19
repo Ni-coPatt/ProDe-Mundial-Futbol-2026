@@ -1,7 +1,6 @@
 CREATE DATABASE IF NOT EXISTS data_base;
 USE data_base;
 
--- Esto solamente para poder probarlo de momento
 DROP TABLE IF EXISTS predicciones;
 DROP TABLE IF EXISTS resultados;
 DROP TABLE IF EXISTS partidos;
