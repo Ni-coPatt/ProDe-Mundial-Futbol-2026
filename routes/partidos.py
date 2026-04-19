@@ -5,10 +5,11 @@ from data.db import get_connection
 from database.queries import (
     crear_partido_db,
     listar_partidos_db,
-    reemplazar_partido_db,
-    buscar_partido_id_db,
-    actualizar_db,
-    eliminar_db,
+    actualizar_partido_db,
+    buscar_partido_db,
+    actualizar_partido_parcial_db,
+    eliminar_partido_db,
+    contar_partidos_db,
 )
 
 from utils.validations import (
@@ -122,7 +123,7 @@ def obtener_partido(id: int):
 
     try:
         conn = get_connection()
-        row = buscar_partido_id_db(id, conn)
+        row = buscar_partido_db(conn, id)
 
         if row is None:
             return jsonify({"error": "Partido no encontrado"}), 404
@@ -186,11 +187,11 @@ def reemplazar_partido(id):
     try:
         conn = get_connection()
 
-        partido = buscar_partido_id_db(id, conn)
+        partido = buscar_partido_db(conn, id)
         if not partido:
             return jsonify({"error": "Partido no encontrado"}), 404
 
-        remplazado = reemplazar_partido_db(
+        remplazado = actualizar_partido_db(
             conn, id, data["equipo_local"], data["equipo_visitante"], data["fecha"], data["fase"]
         )
 
@@ -237,11 +238,11 @@ def actualizar_partido(id):
     try:
         conn = get_connection()
 
-        partido = buscar_partido_id_db(id, conn)
+        partido = buscar_partido_db(conn, id)
         if not partido:
             return jsonify({"error": "Partido no encontrado"}), 404
 
-        partido_actualizado = actualizar_db(id, cambios, conn)
+        partido_actualizado = actualizar_partido_parcial_db(conn, id, cambios)
 
         if partido_actualizado:
             return "", 204
@@ -264,11 +265,11 @@ def eliminar_partido(id):
     try:
         conn = get_connection()
 
-        partido = buscar_partido_id_db(id, conn)
+        partido = buscar_partido_db(conn, id)
         if not partido:
             return jsonify({"error": "Partido no encontrado"}), 404
 
-        partido_eliminado = eliminar_db(id, conn)
+        partido_eliminado = eliminar_partido_db(conn, id)
 
         if partido_eliminado:
             return "", 204
