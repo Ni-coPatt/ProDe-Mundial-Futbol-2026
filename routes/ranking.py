@@ -1,7 +1,5 @@
 from flask import Blueprint, jsonify
 from data.db import get_connection
-## from data.predicciones import predicciones
-## from database.queries import listar_partidos_db
 
 ranking_bp = Blueprint("ranking", __name__)
 
