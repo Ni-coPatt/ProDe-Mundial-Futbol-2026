@@ -1,14 +1,35 @@
 from flask import Blueprint, jsonify
 from data.db import get_connection
+## from data.predicciones import predicciones
+## from database.queries import listar_partidos_db
 
 ranking_bp = Blueprint("ranking", __name__)
 
-@ranking_bp.route("/ranking")
-
-from data.predicciones import predicciones
-from data.partidos import partidos
-
+@ranking_bp.route("/")
 def calcular_ranking():
+
+    conn = get_connection()
+    cur = None
+    try:
+        cur = conn.cursor(dictionary=True)
+        query = """
+            SELECT *
+            FROM resultados
+    """
+        cur.execute(query)
+        partidos = cur.fetchall()
+        query = """
+            SELECT *
+            FROM predicciones
+    """
+        cur.execute(query)
+        predicciones = cur.fetchall()
+    except Exception as e:
+        raise Exception(f"Error buscando partidos: {e}")
+    finally:
+        if cur:
+            cur.close()
+
     ranking = {}
 
     for pred in predicciones:
@@ -67,4 +88,4 @@ def calcular_ranking():
 
     resultado_final.sort(key=lambda x: x["puntos"], reverse=True)
 
-    return resultado_final
+    return jsonify(resultado_final), 200

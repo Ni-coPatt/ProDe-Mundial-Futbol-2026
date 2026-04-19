@@ -1,0 +1,6 @@
+## CREÉ ESTE ARCHIVO REQUIREMENTS.TXT PARA INSTALAR MÁS FÁCILMENTE LAS DEPENDENCIAS DE LA API
+
+flask
+requests
+flask-cors
+mysql-connector-python
