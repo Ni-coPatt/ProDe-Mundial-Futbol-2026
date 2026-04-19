@@ -12,7 +12,11 @@ def validar_fecha(fecha_str):
 
 
 def validar_fase(fase):
-    return isinstance(fase, str) and fase.strip().lower() in FASES_VALIDAS
+    """Valida fase (case-insensitive)."""
+    if not isinstance(fase, str):
+        return False
+    fase_lower = fase.strip().lower()
+    return fase_lower in FASES_VALIDAS
 
 
 def validar_campos_obligatorios(data, campos):

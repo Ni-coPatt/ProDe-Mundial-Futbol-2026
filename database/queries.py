@@ -131,7 +131,7 @@ def eliminar_partido_db(conn, id):
 
 
 def listar_partidos_db(conn, limit, offset, equipo=None, fecha=None, fase=None):
-    """Lista partidos con filtros opcionales y paginación."""
+    """Lista partidos con filtros opcionales y paginación. Retorna (partidos, total)."""
     if limit <= 0 or offset < 0:
         raise ValueError("Limit debe ser > 0 y offset >= 0")
     
@@ -145,18 +145,26 @@ def listar_partidos_db(conn, limit, offset, equipo=None, fecha=None, fase=None):
             filtros.append("(equipo_local = %s OR equipo_visitante = %s)")
             params.extend([equipo, equipo])
         if fecha:
-            filtros.append("fecha = %s")
+            filtros.append("DATE(fecha) = %s")
             params.append(fecha)
         if fase:
             filtros.append("fase = %s")
             params.append(fase)
         
         where = "WHERE " + " AND ".join(filtros) if filtros else ""
+        
+        # Contar total con los mismos filtros
+        count_query = f"SELECT COUNT(*) as total FROM partidos {where}"
+        cur.execute(count_query, params)
+        total = cur.fetchone()["total"]
+        
+        # Listar partidos con paginación
         query = f"SELECT * FROM partidos {where} LIMIT %s OFFSET %s"
         params.extend([limit, offset])
-        
         cur.execute(query, params)
-        return cur.fetchall()
+        partidos = cur.fetchall()
+        
+        return partidos, total
     except Exception as e:
         raise Exception(f"Error listando partidos: {e}")
     finally:

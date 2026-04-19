@@ -256,8 +256,6 @@ def actualizar_partido(id):
     finally:
         if conn:
             conn.close()
-
-
 # endpoint 6
 @partidos_bp.route("/<int:id>", methods=["DELETE"])
 def eliminar_partido(id):
@@ -288,27 +286,27 @@ def eliminar_partido(id):
 # endpoint 7 luna
 @partidos_bp.route("/<int:id>/resultado", methods=["PUT"])
 def cargar_resultado(id):
-    conn = None
-    cur = None
+    data = request.get_json()
+
+    if not data:
+        return jsonify({"error": "Body vacío"}), 400
+
+    if "local" not in data or "visitante" not in data:
+        return jsonify({"error": "Faltan datos"}), 400
 
     try:
-        data = request.get_json()
+        goles_local = int(data["local"])
+        goles_visitante = int(data["visitante"])
+    except (ValueError, TypeError):
+        return jsonify({"error": "Goles deben ser enteros"}), 400
 
-        if not data:
-            return jsonify({"error": "Body vacío"}), 400
+    if goles_local < 0 or goles_visitante < 0:
+        return jsonify({"error": "Goles inválidos"}), 400
 
-        if "local" not in data or "visitante" not in data:
-            return jsonify({"error": "Faltan datos"}), 400
-
-        try:
-            goles_local = int(data["local"])
-            goles_visitante = int(data["visitante"])
-        except (ValueError, TypeError):
-            return jsonify({"error": "Goles deben ser enteros"}), 400
-
-        if goles_local < 0 or goles_visitante < 0:
-            return jsonify({"error": "Goles inválidos"}), 400
-
+    conn = None
+    cur = None
+    
+    try:
         conn = get_connection()
         cur = conn.cursor(dictionary=True)
         
@@ -352,6 +350,8 @@ def cargar_resultado(id):
         return "", 204
 
     except Exception as e:
+        if conn:
+            conn.rollback()
         print(e)
         return jsonify({"error": "Error interno del servidor"}), 500
 

@@ -39,10 +39,10 @@ def listar_usuarios():
         lista = {
             "usuarios": usuarios,
             "_links": {
-                "_first": {"href": f"/usuarios?_offset=0&_limit={limit}"},
-                "_prev": {"href": f"/usuarios?_offset={max(0, offset - limit)}&_limit={limit}"},
-                "_next": {"href": f"/usuarios?_offset={offset + limit}&_limit={limit}"},
-                "_last": {"href": f"/usuarios?_offset={ultimo_offset}&_limit={limit}"},
+                "_first": {"href": f"/usuarios/?_offset=0&_limit={limit}"},
+                "_prev": {"href": f"/usuarios/?_offset={max(0, offset - limit)}&_limit={limit}"},
+                "_next": {"href": f"/usuarios/?_offset={offset + limit}&_limit={limit}"},
+                "_last": {"href": f"/usuarios/?_offset={ultimo_offset}&_limit={limit}"},
             },
         }
 
