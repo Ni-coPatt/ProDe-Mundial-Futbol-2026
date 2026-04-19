@@ -21,7 +21,12 @@ def buscar_partido_id_db(id, conn):
     cur = None
     try:
         cur = conn.cursor(dictionary=True)
-        query = "SELECT * FROM partidos WHERE id = %s"
+        query = """
+            SELECT p.*, r.goles_local, r.goles_visitante 
+            FROM partidos p
+            LEFT JOIN resultados r ON p.id = r.partido_id
+            WHERE p.id = %s
+        """
         cur.execute(query, (id,))
         return cur.fetchone()
     finally:
