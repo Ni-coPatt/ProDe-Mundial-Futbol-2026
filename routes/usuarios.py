@@ -30,9 +30,9 @@ def listar_usuarios():
         if not usuarios:
             return jsonify({"usuarios": []}), 204
         
-        #calculamos el ultimo offset posible.
-        cursor.execute("SELECT COUNT(*) AS total FROM usuarios")
-        resultado= cursor.fetcheone()
+         #calculamos el ultimo offset posible.
+         cursor.execute("SELECT COUNT(*) AS total FROM usuarios")
+         resultado = cursor.fetchone()
         total_usuarios= resultado['total']
         ultimo_offset= ((total_usuarios - 1) // limit) * limit
     
@@ -145,12 +145,12 @@ def reemplazar_usuario(id):
         conexion = get_connection()
         cursor = conexion.cursor()
 
-        query_update = "UPDATE usuarios SET nombre = %s, mail = %s WHERE id = %s"
+        query_update = "UPDATE usuarios SET nombre = %s, email = %s WHERE id = %s"
         cursor.execute(query_update, (nombre, email, id))
         
         if cursor.rowcount == 0:
-            query_insert = "INSERT INTO usuarios (id, nombre, mail, puntos) VALUES (%s, %s, %s, 0)"
-            cursor.execute(query_insert, (id, nombre, email))
+            query_insert = "INSERT INTO usuarios (nombre, email, puntos) VALUES (%s, %s, 0)"
+            cursor.execute(query_insert, (nombre, email))
             
         conexion.commit()
 

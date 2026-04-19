@@ -122,11 +122,11 @@ def obtener_partido(id: int):
 
     try:
         conn = get_connection()
-        row = buscar_partido_por_id(id, conn)
+        row = buscar_partido_id_db(id, conn)
 
         if row is None:
             return jsonify({"error": "Partido no encontrado"}), 404
-        
+
         if not validar_fecha(row["fecha"]):
             return jsonify({"error": "Fecha inválida (YYYY-MM-DD)"}), 400
 
@@ -334,7 +334,7 @@ def cargar_resultado(id):
 
         conn.commit()
 
-        return jsonify, 204
+        return "", 204
 
     except Exception as e:
         print(e)
