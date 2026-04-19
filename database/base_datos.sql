@@ -43,7 +43,7 @@ CREATE TABLE resultados(
     partido_id INT NOT NULL,
     goles_local INT DEFAULT NULL,
     goles_visitante INT DEFAULT NULL,
-    FOREIGN KEY (partido_id) REFERENCES partidos(id)
+    FOREIGN KEY (partido_id) REFERENCES partidos(id) ON DELETE CASCADE
 );
 INSERT INTO resultados (partido_id, goles_local, goles_visitante)
 VALUES
@@ -61,7 +61,7 @@ CREATE TABLE predicciones(
     CONSTRAINT chk_goles_positivos CHECK (goles_local >= 0 AND goles_visitante >= 0),
 
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
-    FOREIGN KEY (partido_id) REFERENCES partidos(id)
+    FOREIGN KEY (partido_id) REFERENCES partidos(id) ON DELETE CASCADE
 );
 
 INSERT INTO predicciones (usuario_id, partido_id, goles_local, goles_visitante)

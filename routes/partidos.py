@@ -127,9 +127,6 @@ def obtener_partido(id: int):
         if row is None:
             return jsonify({"error": "Partido no encontrado"}), 404
 
-        if not validar_fecha(row["fecha"]):
-            return jsonify({"error": "Fecha inválida (YYYY-MM-DD)"}), 400
-
         if not validar_fase(row["fase"]):
             return jsonify({"error": "Fase inválida"}), 400
 
@@ -313,24 +310,41 @@ def cargar_resultado(id):
 
         conn = get_connection()
         cur = conn.cursor(dictionary=True)
-        cur.execute("SELECT goles_local, goles_visitante FROM partidos WHERE id = %s", (id,))
-
+        
+        # Verificar que el partido existe
+        cur.execute("SELECT id FROM partidos WHERE id = %s", (id,))
         partido = cur.fetchone()
 
         if not partido:
             return jsonify({"error": "Partido no encontrado"}), 404
 
-        if partido["goles_local"] is not None or partido["goles_visitante"] is not None:
+        # Verificar si ya existe resultado
+        cur.execute("SELECT goles_local, goles_visitante FROM resultados WHERE partido_id = %s", (id,))
+        resultado_existente = cur.fetchone()
+
+        if resultado_existente and (resultado_existente["goles_local"] is not None or resultado_existente["goles_visitante"] is not None):
             return jsonify({"error": "Resultado ya cargado"}), 400
 
-        cur.execute(
-            """
-            UPDATE partidos
-            SET goles_local = %s, goles_visitante = %s
-            WHERE id = %s
-            """,
-            (goles_local, goles_visitante, id),
-        )
+        # Guardar resultado
+        if resultado_existente:
+            # UPDATE si ya existe registro
+            cur.execute(
+                """
+                UPDATE resultados
+                SET goles_local = %s, goles_visitante = %s
+                WHERE partido_id = %s
+                """,
+                (goles_local, goles_visitante, id),
+            )
+        else:
+            # INSERT si es nuevo
+            cur.execute(
+                """
+                INSERT INTO resultados (partido_id, goles_local, goles_visitante)
+                VALUES (%s, %s, %s)
+                """,
+                (id, goles_local, goles_visitante),
+            )
 
         conn.commit()
 
