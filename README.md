@@ -9,22 +9,24 @@ Desarrollada con **Python + Flask + MySQL**, para la materia Introducción al De
 ## Estructura del proyecto
 
 ```
-prode-mundial/
-├── main.py                # Programa principal
+ProDe-Mundial-Futbol-2026/
 ├── data/
+│   └── db.py    # Predicciones
+├── database/
+│   ├── base_datos.sql        # Lista de partidos
+│   └── queries.py    # Predicciones
+├── routes/
 │   ├── partidos.py        # Lista de partidos
-│   ├── usuarios.py        # Lista de usuarios
-│   ├── resultados.py      # Resultados
-│   └── predicciones.py    # Predicciones
-│
-├── logic/
-│   ├── partidos.py        # Funciones sobre partidos
-│   ├── usuarios.py        # Funciones sobre usuarios
-│   ├── predicciones.py    # Funciones de predicción
-│   └── ranking.py         # Cálculo de ranking
-│
-└── tests/
-    └── test_partidos.py
+│   ├── ranking.py        # Lista de partidos
+│   └── usuarios.py    # Predicciones
+├── utils/
+│   ├── helpers.py        # Lista de partidos
+│   └── validations.py    # Predicciones
+├── .gitignore               # Programa principal
+├── app.py        # Lista de partidos
+├── README.md        # Lista de partidos
+├── requirements.txt       # Lista de partidos
+└── swagger.yaml    # Predicciones
 ```
 
 ---
@@ -34,8 +36,8 @@ prode-mundial/
 ### 1. Clonar el repositorio
 
 ```bash
-git clone https://github.com/TU_USUARIO/prode-mundial.git
-cd prode-mundial
+git clone https://github.com/Ni-coPatt/ProDe-Mundial-Futbol-2026
+cd ProDe-Mundial-Futbol-2026
 ```
 
 ### 2. Crear entorno virtual e instalar dependencias
@@ -55,15 +57,12 @@ cp .env.example .env
 
 ### 4. Crear la base de datos
 
-**Opción A** — con el script SQL:
+con el script SQL:
 ```bash
-mysql -u root -p < migrations/crear_tablas.sql
+mysql -u root -p < database/base_datos.sql
 ```
 
-**Opción B** — automático al levantar la app:
-```bash
-python run.py   # db.create_all() crea las tablas si no existen
-```
+
 
 ### 5. Levantar el servidor
 
