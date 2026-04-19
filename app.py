@@ -8,5 +8,9 @@ app.register_blueprint(partidos_bp, url_prefix="/partidos")
 app.register_blueprint(usuarios_bp, url_prefix="/usuarios")
 app.register_blueprint(ranking_bp, url_prefix="/ranking")
 
+@app.route('/')
+def home():
+    return "Servidor ProDe Mundial 2026 activo"
+
 if __name__ == "__main__":
     app.run(port=5000, debug=True)
