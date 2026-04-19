@@ -88,7 +88,7 @@ def crear_partido():
     try:
         conn = get_connection()
 
-        nuevo_id = crear_partido_db(conn, data["equipo_local"], data["equipo_visitante"], data["fecha"], data["fase"])
+        nuevo_id = crear_partido_db(conn, data["equipo_local"], data["equipo_visitante"], data["fecha"], data["fase"], data["estadio"], data["ciudad"])
 
         return (
             jsonify(
@@ -98,6 +98,8 @@ def crear_partido():
                     "equipo_visitante": data["equipo_visitante"],
                     "fecha": data["fecha"],
                     "fase": data["fase"],
+                    "estadio": data["estadio"],
+                    "ciudad": data["ciudad"],
                 }
             ),
             201,
