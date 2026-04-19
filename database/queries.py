@@ -158,8 +158,13 @@ def listar_partidos_db(conn, limit, offset, equipo=None, fecha=None, fase=None):
         cur.execute(count_query, params)
         total = cur.fetchone()["total"]
         
-        # Listar partidos con paginación
-        query = f"SELECT * FROM partidos {where} LIMIT %s OFFSET %s"
+        # Listar partidos con paginación y trayendo los goles de la tabla resultados
+        query = f"""
+            SELECT p.*, r.goles_local, r.goles_visitante
+            FROM partidos p
+            LEFT JOIN resultados r ON p.id = r.partido_id
+            {where} LIMIT %s OFFSET %s
+        """
         params.extend([limit, offset])
         cur.execute(query, params)
         partidos = cur.fetchall()
