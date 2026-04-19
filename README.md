@@ -11,22 +11,22 @@ Desarrollada con **Python + Flask + MySQL**, para la materia Introducción al De
 ```
 ProDe-Mundial-Futbol-2026/
 ├── data/
-│   └── db.py    # Predicciones
+│   └── db.py    # Conexión con la base de datos
 ├── database/
-│   ├── base_datos.sql        # Lista de partidos
-│   └── queries.py    # Predicciones
+│   ├── base_datos.sql        # Script para crear la base de datos y las tablas
+│   └── queries.py    # Consultas SQL
 ├── routes/
-│   ├── partidos.py        # Lista de partidos
-│   ├── ranking.py        # Lista de partidos
-│   └── usuarios.py    # Predicciones
+│   ├── partidos.py        # Endpoints de partidos
+│   ├── ranking.py        # Endpoint de ranking
+│   └── usuarios.py    # Endpoints de usuarios
 ├── utils/
-│   ├── helpers.py        # Lista de partidos
-│   └── validations.py    # Predicciones
-├── .gitignore               # Programa principal
-├── app.py        # Lista de partidos
-├── README.md        # Lista de partidos
-├── requirements.txt       # Lista de partidos
-└── swagger.yaml    # Predicciones
+│   ├── helpers.py        # Funciones de utilidad general
+│   └── validations.py    # Validacion de entrada de datos
+├── .gitignore               # Archivos excluidos
+├── app.py        # Archivo principal
+├── README.md        # Documentación general del proyecto
+├── requirements.txt       # Dependencias de la API
+└── swagger.yaml    
 ```
 
 ---
@@ -67,6 +67,6 @@ mysql -u root -p < database/base_datos.sql
 ### 5. Levantar el servidor
 
 ```bash
-python run.py
+python3 app.py
 # Servidor corriendo en http://localhost:5000
 ```
