@@ -373,7 +373,7 @@ def registrar_prediccion(id):
     try:
         data = request.get_json()
         
-        # 1. Validaciones básicas
+        # 1. Validaciones
         if not data:
             return jsonify({"error": "Body vacío"}), 400
             
