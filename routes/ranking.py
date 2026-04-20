@@ -32,7 +32,7 @@ def calcular_ranking():
         if cur: cur.close()
         if conn: conn.close()
 
-    # 2. Lógica de cálculo de puntos (la tuya, que está perfecta)
+    # 2. Lógica de cálculo de puntos
     ranking = {}
 
     for pred in predicciones:
