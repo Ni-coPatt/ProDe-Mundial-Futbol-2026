@@ -64,7 +64,6 @@ def calcular_ranking():
     total_count = len(resultado_final)
     paginated_items = resultado_final[offset : offset + limit]
 
-    # 5. Generar los enlaces HATEOAS con tu helper
     links = pagination_links(request.base_url, limit, offset, total_count)
 
     return jsonify({
