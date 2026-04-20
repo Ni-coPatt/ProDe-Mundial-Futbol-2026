@@ -133,7 +133,7 @@ def obtener_partido(id: int):
         if not validar_fase(row["fase"]):
             return jsonify({"error": "Fase inválida"}), 400
 
-        # 👉 conversión simple de fecha (sin isoformat para evitar errores)
+   
         fecha = row["fecha"]
         fecha = str(fecha) if fecha else None
 
