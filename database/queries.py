@@ -3,10 +3,10 @@ Funciones de acceso a base de datos para partidos.
 """
 
 
-def crear_partido_db(conn, equipo_local, equipo_visitante, fecha, fase):
+def crear_partido_db(conn, equipo_local, equipo_visitante, fecha, fase, estadio, ciudad): # <-- AGREGADOS AQUÍ
     """Crea un nuevo partido en la BD."""
-    if not equipo_local or not equipo_visitante or not fecha or not fase:
-        raise ValueError("Todos los campos son obligatorios")
+    if not equipo_local or not equipo_visitante or not fecha or not fase or not estadio or not ciudad:
+        raise ValueError("Todos los campos (incluyendo estadio y ciudad) son obligatorios")
     
     cur = None
     try:
@@ -48,13 +48,12 @@ def buscar_partido_db(conn, id):
         if cur:
             cur.close()
 
-
-def actualizar_partido_db(conn, id, equipo_local, equipo_visitante, fecha, fase):
+def actualizar_partido_db(conn, id, equipo_local, equipo_visitante, fecha, fase, estadio, ciudad):
     """Reemplaza un partido completo (PUT)."""
     if id <= 0:
         raise ValueError("ID debe ser positivo")
-    if not equipo_local or not equipo_visitante or not fecha or not fase:
-        raise ValueError("Todos los campos son obligatorios")
+    if not equipo_local or not equipo_visitante or not fecha or not fase or not estadio or not ciudad:
+        raise ValueError("Todos los campos (incluyendo estadio y ciudad) son obligatorios")
     
     cur = None
     try:
@@ -64,10 +63,12 @@ def actualizar_partido_db(conn, id, equipo_local, equipo_visitante, fecha, fase)
             SET equipo_local = %s,
                 equipo_visitante = %s,
                 fecha = %s,
-                fase = %s
+                fase = %s,
+                estadio = %s,
+                ciudad = %s
             WHERE id = %s
         """
-        cur.execute(query, (equipo_local, equipo_visitante, fecha, fase, id))
+        cur.execute(query, (equipo_local, equipo_visitante, fecha, fase, estadio, ciudad, id))
         conn.commit()
         return cur.rowcount > 0
     except Exception as e:
@@ -78,6 +79,7 @@ def actualizar_partido_db(conn, id, equipo_local, equipo_visitante, fecha, fase)
             cur.close()
 
 
+
 def actualizar_partido_parcial_db(conn, id, cambios):
     """Actualiza parcialmente un partido (PATCH)."""
     if id <= 0:
@@ -86,7 +88,7 @@ def actualizar_partido_parcial_db(conn, id, cambios):
         raise ValueError("Debe enviar al menos un campo a actualizar")
     
     # Validar que solo permite ciertos campos
-    campos_permitidos = {"equipo_local", "equipo_visitante", "fecha", "fase"}
+    campos_permitidos = {"equipo_local", "equipo_visitante", "fecha", "fase", "estadio", "ciudad"}
     for campo in cambios.keys():
         if campo not in campos_permitidos:
             raise ValueError(f"Campo no permitido: {campo}")
