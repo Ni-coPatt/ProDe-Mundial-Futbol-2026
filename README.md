@@ -48,23 +48,14 @@ source venv/bin/activate        # En Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 3. Configurar variables de entorno
-
-```bash
-cp .env.example .env
-# Editar .env con tus credenciales de MySQL
-```
-
-### 4. Crear la base de datos
+### 3. Crear la base de datos
 
 con el script SQL:
 ```bash
 mysql -u root -p < database/base_datos.sql
 ```
 
-
-
-### 5. Levantar el servidor
+### 4. Levantar el servidor
 
 ```bash
 python3 app.py
